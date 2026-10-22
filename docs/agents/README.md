@@ -30,7 +30,7 @@ agent PRs here and carries finished work to `DocumentDrivenDX/umf` separately.
 
 ## Environment setup
 
-The repo uses Bun 1.3.x. If `bun` is missing: `curl -fsSL https://bun.sh/install | bash`
+The repo pins its Bun version in `package.json` (`packageManager`). If `bun` is missing or older: `curl -fsSL https://bun.sh/install | bash`
 then `export PATH="$HOME/.bun/bin:$PATH"`. Install dependencies with
 `bun install --frozen-lockfile`.
 
