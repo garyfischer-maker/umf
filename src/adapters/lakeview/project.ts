@@ -7,13 +7,13 @@ export interface LakeviewProjection {root:Json;modules:Map<string,Json>;elements
 export const elementKey=(module:string,element:string)=>JSON.stringify([module,element]);
 const SQL='databricks-sql';
 const charts=new Set(['counter','bar','line','area','scatter','pie','heatmap','table']);
-const controls:Record<string,string>={'filter-single-select':'single-select','filter-multi-select':'multi-select','filter-date-range-picker':'date-range','filter-text-entry':'text-search','filter-range-slider':'range'};
-const channels:Record<string,string>={x:'x',y:'y',color:'color',size:'size',label:'label',value:'value',target:'target',angle:'angle',extra:'tooltip',columns:'column'};
+export const controls:Record<string,string>={'filter-single-select':'single-select','filter-multi-select':'multi-select','filter-date-range-picker':'date-range','filter-text-entry':'text-search','filter-range-slider':'range'};
+export const channels:Record<string,string>={x:'x',y:'y',color:'color',size:'size',label:'label',value:'value',target:'target',angle:'angle',extra:'tooltip',columns:'column'};
 const simple:Record<string,string>={SUM:'sum',AVG:'avg',MIN:'min',MAX:'max',COUNT:'count'};
-const formats:Record<string,string>={'number':'number','number-plain':'number','number-currency':'currency','number-percent':'percent'};
+export const formats:Record<string,string>={'number':'number','number-plain':'number','number-currency':'currency','number-percent':'percent'};
 // Renderer options that change presentation only; each widget reports them once.
 const presentation=['withRowNumber','paginationSize','itemsPerPage','condensed','allowHTMLByDefault','bandedRows','invisibleColumns'];
-const roles:Record<string,string>={canvasBackgroundColor:'canvasBackground',widgetBackgroundColor:'widgetBackground',widgetBorderColor:'widgetBorder',fontColor:'font',selectionColor:'selection'};
+export const roles:Record<string,string>={canvasBackgroundColor:'canvasBackground',widgetBackgroundColor:'widgetBackground',widgetBorderColor:'widgetBorder',fontColor:'font',selectionColor:'selection'};
 // Aggregate function names Lakeview and Databricks SQL emit around a single column; anything else is a row-level function.
 const aggregate=/^(SUM|AVG|MEAN|MIN|MAX|COUNT|COUNT_IF|SUM_IF|AVG_IF|ANY_VALUE|FIRST|LAST|MEDIAN|MODE|PERCENTILE|PERCENTILE_APPROX|APPROX_PERCENTILE|APPROX_COUNT_DISTINCT|STDDEV|STDDEV_POP|STDDEV_SAMP|VARIANCE|VAR_POP|VAR_SAMP|MIN_BY|MAX_BY|BOOL_AND|BOOL_OR|EVERY|SOME|COLLECT_LIST|COLLECT_SET|ARRAY_AGG)\s*\(/i;
 const quoted='`((?:[^`]|``)+)`';

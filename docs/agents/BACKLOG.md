@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** —
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
@@ -41,3 +41,17 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   `dist/*` bundles which a fresh checkout does not have; and a note that installs made
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
+
+## AB-005 — Lakeview export: Databricks acceptance check
+- **Type:** research · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- AB-001's synthesized widget shapes (spec versions, query field names, filter default
+  data types) come from dashboards observed during import work, not a Databricks schema.
+  Find public Databricks documentation or open samples that confirm or contradict each
+  assumption listed in CONTRACT-083, and list what a human with a workspace should try
+  importing.
+
+## AB-006 — Lakeview export: carry plain column titles, types and widget query filters
+- **Type:** build · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- Exports currently report neutral field titles/types and unused declared fields as
+  `LAKEVIEW_EXPORT_UNMAPPED`. Decide with a human whether `umf.lakeview` should gain a
+  place for them (for example dataset `columns` entries) before building anything.
