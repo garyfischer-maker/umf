@@ -26,7 +26,7 @@ ddx:
 
 ## Overview
 
-Import a Databricks AI/BI (Lakeview) `.lvdash.json` dashboard into UMF. The native
+Import a Databricks AI/BI (Lakeview) `.lvdash.json` dashboard into UMF, and export an edited neutral declaration back to one. The native
 dashboard is retained exactly, split across the same document, modules and elements
 that carry its `umf.dashboard` declaration: one data module of datasets, one module per
 page and one element per layout item. The importer returns a loss report that names
@@ -63,6 +63,9 @@ hand, and the losses are recorded nowhere.
   properties cannot be dropped silently.
 - LV-05: Omit, and report, any neutral item that the dashboard profile would reject,
   rather than emitting an invalid neutral declaration.
+- LV-06: Export the current `umf.dashboard` declaration as Lakeview JSON: reuse retained
+  native JSON where the neutral declaration is unchanged, patch only the native members an
+  edit maps to, and build and report the rest (CONTRACT-083).
 
 ### Non-Functional Requirements
 
@@ -73,6 +76,7 @@ Databricks is unverified.
 ## User Stories
 
 - [US-093: Import a Lakeview dashboard with an explicit loss report](../user-stories/US-093-lakeview-dashboard-interchange.md).
+- [US-094: Export an edited neutral dashboard as Lakeview JSON](../user-stories/US-094-neutral-to-lakeview-export.md).
 
 ## Edge Cases and Error Handling
 
@@ -91,5 +95,5 @@ every construct both declare; every unprojected construct appears in the loss re
 
 ## Out of Scope
 
-Neutral-to-Lakeview export of edited declarations, Tableau interchange, parsing SQL,
+Tableau interchange, parsing SQL,
 inferring field types without a catalog, and verifying exports against Databricks.

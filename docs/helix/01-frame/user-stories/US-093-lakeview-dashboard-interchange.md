@@ -49,4 +49,4 @@ so that I can port or restyle it while seeing every construct that did not trans
 (synthetic data) and authored mutations. Evidence is limited to that file plus local,
 uncommitted dashboards used during development; there is no Databricks oracle, so
 acceptance of exported files by a workspace is unverified. CONTRACT-082 governs rule
-scope. Exporting an edited neutral declaration to Lakeview is follow-on work.
+scope. Exporting an edited neutral declaration is US-094.
