@@ -6,6 +6,8 @@ import {parseNativeJson,renderTree,cloneTree,type NativeJson} from '../../model/
 import {UmfError,pointer,type Document,type Json,type Diagnostic,type ExtensionPackage,type Scope} from '../../model/types';
 import {dashboardRegistry,DASHBOARD_EXTENSION} from '../../extensions/dashboard';
 import {projectLakeview,elementKey,type LakeviewIssue} from './project';
+import {exportNeutralLakeview,type LakeviewExport} from './export';
+export {type LakeviewExport,type LakeviewExportIssue} from './export';
 export {type LakeviewIssue} from './project';
 export const LAKEVIEW_EXTENSION='umf.lakeview';
 export const lakeviewPackage=manifest as unknown as ExtensionPackage;
@@ -98,4 +100,18 @@ export function getLakeviewNative(document:Document,module?:string,element?:stri
  const owner=document.modules.find(m=>m.id===module);if(!owner||!lv(owner))throw new UmfError('LAKEVIEW_REFERENCE','Missing Lakeview module');
  if(element===undefined){if(lv(owner).kind!=='page')throw new UmfError('LAKEVIEW_REFERENCE','Only page modules carry native content');return renderTree(page(owner));}
  const target=lv(owner.elements.find(e=>e.id===element));if(!target)throw new UmfError('LAKEVIEW_REFERENCE','Missing Lakeview element');return renderTree(cloneTree(target.native));
+}
+/**
+ * Exports the document's current umf.dashboard declaration as .lvdash.json. Units whose neutral declaration still equals what their
+ * retained umf.lakeview JSON projects to keep that JSON exactly; edits change the corresponding native members; the rest is built from the
+ * neutral declaration. The issues list what was synthesized, assumed or could not be expressed.
+ */
+export function exportNeutralToLakeview(document:Document):LakeviewExport{
+ const checked=inspectLakeview(document),errors=checked.diagnostics.filter(d=>d.severity==='error');
+ if(errors.length)throw new UmfError('LAKEVIEW_DOCUMENT',JSON.stringify(errors));
+ if(document.vocabularies[DASHBOARD_EXTENSION]?.version!=='0.1.0'||(document.extensions?.[DASHBOARD_EXTENSION] as any)?.kind!=='dashboard')throw new UmfError('DASHBOARD_PROFILE','Expected umf.dashboard 0.1.0 and a document-level dashboard');
+ if(lv(document)===undefined)return exportNeutralLakeview(document);
+ if(document.vocabularies[LAKEVIEW_EXTENSION]?.version!=='0.1.0'||lv(document).kind!=='dashboard')throw new UmfError('LAKEVIEW_PAYLOAD','Expected umf.lakeview 0.1.0 and a document-level dashboard');
+ if(checked.diagnostics.some(d=>d.code==='LAKEVIEW_REPRESENTATION'))throw new UmfError('LAKEVIEW_EXPORT','Unknown representation fields cannot be discarded');
+ return exportNeutralLakeview(document,JSON.parse(renderTree(dashboard(document))));
 }

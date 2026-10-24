@@ -116,3 +116,5 @@ source. The issues map to HELIX `[NEEDS CLARIFICATION]` markers in dashboard wor
 namespace?})`, `exportLakeviewDashboard(document)` and
 `getLakeviewNative(document, module?, element?)`, which returns a copy of the rendered
 native JSON for the document, a page or an element.
+
+`exportNeutralToLakeview(document)` exports an edited neutral declaration (CONTRACT-083).
