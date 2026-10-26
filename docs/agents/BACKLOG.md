@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** https://github.com/garyfischer-maker/umf/pull/3
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
@@ -41,3 +41,17 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   `dist/*` bundles which a fresh checkout does not have; and a note that installs made
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
+
+## AB-005 — Lakeview export patch rules for structural edits
+- **Type:** build · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- `exportLakeviewFromNeutral` reports, but does not carry, edits to a retained widget's
+  chart family, encodings (title, scale, sort, format), dataset reference, dataset
+  measures and the dashboard theme/grid (`LAKEVIEW_EXPORT_UNSYNCED`). Add patch rules
+  for the safe subset, keeping each verified by the re-projection check.
+
+## AB-006 — Workspace acceptance of synthesized Lakeview widgets
+- **Type:** research · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- Synthesized widget `version` numbers, query field names and filter queries follow one
+  fixture and are unverified against Databricks. Document what a workspace requires
+  (for a human to check by importing an exported file), including the associative-filter
+  predicate omitted from synthesized filters.
