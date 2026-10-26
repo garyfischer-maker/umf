@@ -15,6 +15,8 @@ ddx:
       kind: informed_by
     - id: US-093
       kind: informed_by
+    - id: US-094
+      kind: informed_by
 ---
 
 # CONTRACT-082: Lakeview dashboard interchange
@@ -55,6 +57,34 @@ against Databricks, so interpretation is never complete.
 module and pages from page modules in module order, and renders compact JSON. The
 result equals the source after the same compact rendering; whitespace and line endings
 are not retained.
+
+## Export from the neutral declaration
+
+`exportLakeviewFromNeutral(document)` returns `{text, issues}`. It first re-projects the
+retained native members to learn what each neutral item looked like at import. An item
+equal to that projection reuses its native JSON exactly. A changed item patches only
+these members: visual and filter `title` and `description` (`widget/spec/frame`),
+`position` (divided by the page's horizontal scale), markdown text content, filter
+target column when its query serves that target alone, page `title` and `role`
+(`displayName`, `pageType`) and dataset `title` (`displayName`). Neutral items without
+a payload are synthesized: datasets as `queryLines` plus measure `columns`; visuals as
+one `main_query` with fields named `sum(c)`, `measure(m)`, `countdistinct(c)` and
+encodings inverse to the import rules; filters with one query per target dataset;
+text as `multilineTextboxSpec`; pages as `GRID_V1` canvas or global-filters pages when
+the grid is not six columns; theme as `uiSettings.theme`. A document with no
+`umf.lakeview` payload gets a fresh dashboard payload.
+
+After writing, the exported text is projected again and compared with the neutral
+declaration; each differing member is reported. Issues are
+`{path, code, detail}` with `path` a JSON Pointer into the neutral document:
+`LAKEVIEW_EXPORT_UNSYNCED` (a neutral edit has no native rule; the retained native
+member is exported), `LAKEVIEW_EXPORT_UNSUPPORTED` (neutral content with no native
+member, such as dataset grain, column titles or the `detail` channel) and
+`LAKEVIEW_EXPORT_ASSUMPTION` (a synthesis choice, such as rounding to the six-column
+grid or omitting the associative-filter predicate). A neutral document that fails
+`umf.dashboard` inspection throws `LAKEVIEW_EXPORT_NEUTRAL`. A neutral payload that is
+absent where a native widget exists keeps the native widget. Root `title` has no
+native member. Workspace acceptance of synthesized widgets is unverified.
 
 ## Projection
 
@@ -114,5 +144,6 @@ source. The issues map to HELIX `[NEEDS CLARIFICATION]` markers in dashboard wor
 `lakeviewRegistry()` registers `umf.dashboard` and `umf.lakeview`;
 `inspectLakeview(document)` validates both. `importLakeviewDashboard(text, {id, title?,
 namespace?})`, `exportLakeviewDashboard(document)` and
+`exportLakeviewFromNeutral(document)`, and
 `getLakeviewNative(document, module?, element?)`, which returns a copy of the rendered
 native JSON for the document, a page or an element.

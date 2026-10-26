@@ -6,7 +6,9 @@ import {parseNativeJson,renderTree,cloneTree,type NativeJson} from '../../model/
 import {UmfError,pointer,type Document,type Json,type Diagnostic,type ExtensionPackage,type Scope} from '../../model/types';
 import {dashboardRegistry,DASHBOARD_EXTENSION} from '../../extensions/dashboard';
 import {projectLakeview,elementKey,type LakeviewIssue} from './project';
+import {exportNeutralDashboard,type LakeviewExportIssue} from './export';
 export {type LakeviewIssue} from './project';
+export {type LakeviewExportIssue} from './export';
 export const LAKEVIEW_EXTENSION='umf.lakeview';
 export const lakeviewPackage=manifest as unknown as ExtensionPackage;
 type ObjectTree=Extract<NativeJson,{kind:'object'}>;
@@ -92,6 +94,8 @@ export function importLakeviewDashboard(text:string,options:{id:string;title?:st
  return {document,issues:projection.issues};
 }
 export function exportLakeviewDashboard(document:Document):string{requireValid(document);return renderTree(dashboard(document));}
+/** Exports a umf.dashboard document: retained native members are reused exactly, neutral edits to titles, descriptions, positions, text and filter columns patch only their members, and new items are synthesized; every neutral member the file does not reproduce is reported. */
+export function exportLakeviewFromNeutral(document:Document):{text:string;issues:LakeviewExportIssue[]}{return exportNeutralDashboard(document,exportLakeviewDashboard);}
 /** Rendered native JSON for the dashboard, one page module, or one dataset or layout-item element. */
 export function getLakeviewNative(document:Document,module?:string,element?:string):string{
  requireValid(document);if(module===undefined)return renderTree(dashboard(document));

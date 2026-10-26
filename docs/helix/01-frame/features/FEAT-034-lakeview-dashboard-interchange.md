@@ -73,6 +73,7 @@ Databricks is unverified.
 ## User Stories
 
 - [US-093: Import a Lakeview dashboard with an explicit loss report](../user-stories/US-093-lakeview-dashboard-interchange.md).
+- [US-094: Export a neutral dashboard to Lakeview with an explicit loss report](../user-stories/US-094-neutral-to-lakeview-export.md).
 
 ## Edge Cases and Error Handling
 

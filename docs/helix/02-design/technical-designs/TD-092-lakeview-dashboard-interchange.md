@@ -15,6 +15,8 @@ ddx:
       kind: informed_by
     - id: TD-077
       kind: informed_by
+    - id: US-094
+      kind: informed_by
 ---
 
 # TD-092: Lakeview dashboard interchange
@@ -66,5 +68,11 @@ types; `LAKEVIEW_UNMAPPED` is left with counter `rowNumber`, `applyModeEnabled`,
   are only reported, so a projected visual can be broader than its native widget.
 - Import and inspection copy the document per payload in core validation, so a
   100-widget dashboard takes seconds; acceptable for interchange, not for editors.
-- Neutral-to-Lakeview export of an edited declaration is the next step; it must reuse
-  retained native widget JSON where the neutral item is unchanged.
+- Neutral-to-Lakeview export (`src/adapters/lakeview/export.ts`) works on a copy of the
+  document: it patches retained native payloads for the few edits with a native rule,
+  synthesizes payloads for new items, renders with the existing exporter, then
+  re-projects the output and reports every neutral member it does not reproduce. Edits
+  to chart family, encodings, dataset references, measures and theme of a retained
+  dashboard have no patch rule yet and are reported, never silently dropped.
+  Synthesized shapes follow the one committed fixture; private dashboards were not
+  used for export and no workspace has accepted a synthesized file. [NEEDS CLARIFICATION]
