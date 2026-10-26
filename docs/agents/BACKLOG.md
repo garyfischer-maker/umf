@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** https://github.com/garyfischer-maker/umf/pull/3
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
