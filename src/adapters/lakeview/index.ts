@@ -6,6 +6,7 @@ import {parseNativeJson,renderTree,cloneTree,type NativeJson} from '../../model/
 import {UmfError,pointer,type Document,type Json,type Diagnostic,type ExtensionPackage,type Scope} from '../../model/types';
 import {dashboardRegistry,DASHBOARD_EXTENSION} from '../../extensions/dashboard';
 import {projectLakeview,elementKey,type LakeviewIssue} from './project';
+import {synthesizeDataset,synthesizeItem,synthesizePage,synthesizeTheme} from './synthesize';
 export {type LakeviewIssue} from './project';
 export const LAKEVIEW_EXTENSION='umf.lakeview';
 export const lakeviewPackage=manifest as unknown as ExtensionPackage;
@@ -98,4 +99,114 @@ export function getLakeviewNative(document:Document,module?:string,element?:stri
  const owner=document.modules.find(m=>m.id===module);if(!owner||!lv(owner))throw new UmfError('LAKEVIEW_REFERENCE','Missing Lakeview module');
  if(element===undefined){if(lv(owner).kind!=='page')throw new UmfError('LAKEVIEW_REFERENCE','Only page modules carry native content');return renderTree(page(owner));}
  const target=lv(owner.elements.find(e=>e.id===element));if(!target)throw new UmfError('LAKEVIEW_REFERENCE','Missing Lakeview element');return renderTree(cloneTree(target.native));
+}
+export interface LakeviewExport {text:string;issues:LakeviewIssue[];}
+const canon=(v:any):any=>Array.isArray(v)?v.map(canon):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canon(v[k])])):v;
+const same=(a:unknown,b:unknown)=>JSON.stringify(canon(a))===JSON.stringify(canon(b));
+const isObject=(v:unknown):v is Record<string,unknown>=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+const tree=(value:unknown)=>parseNativeJson(JSON.stringify(value));
+const nameOf=(n:NativeJson|undefined,fallback:string)=>n?.kind==='string'?n.value:fallback;
+/** Applies the difference between two synthesized values to a retained native tree, touching only members that differ. */
+function patch(node:NativeJson|undefined,a:any,b:any,path:string,changes:string[]):NativeJson|undefined{
+ if(same(a,b))return node;
+ if(isObject(a)&&isObject(b)&&node?.kind==='object'){
+  for(const key of new Set([...Object.keys(a),...Object.keys(b)])){
+   const p=path+'/'+pointer(key);
+   if(!Object.hasOwn(b,key)){delete node.members[key];changes.push(p);continue;}
+   const next=patch(node.members[key],a[key],b[key],p,changes);if(next!==undefined)node.members[key]=next;
+  }
+  return node;
+ }
+ if(Array.isArray(a)&&Array.isArray(b)&&node?.kind==='array'&&a.length===b.length&&node.items.length===a.length){
+  node.items=node.items.map((n,i)=>patch(n,a[i],b[i],path+'/'+i,changes)!);return node;
+ }
+ changes.push(path);return tree(b);
+}
+/**
+ * Exports the neutral umf.dashboard declaration to .lvdash.json. Elements whose neutral declaration still equals what the importer
+ * would project from their retained umf.lakeview payload reuse that payload exactly; an edited element has the difference between its
+ * old and new synthesized form applied to the retained payload; elements without a payload are synthesized. Assumptions are reported.
+ */
+export function exportNeutralToLakeview(document:Document):LakeviewExport{
+ const checked=inspectLakeview(document),errors=checked.diagnostics.filter(d=>d.severity==='error');
+ if(errors.length)throw new UmfError('LAKEVIEW_DOCUMENT',JSON.stringify(errors));
+ if(checked.diagnostics.some(d=>d.code==='LAKEVIEW_REPRESENTATION'))throw new UmfError('LAKEVIEW_EXPORT','Unknown representation fields cannot be discarded');
+ const nd=(owner:{extensions?:Record<string,Json>}|undefined)=>owner?.extensions?.[DASHBOARD_EXTENSION] as any,root=nd(document);
+ if(root?.kind!=='dashboard')throw new UmfError('LAKEVIEW_PAYLOAD','Expected a document-level umf.dashboard declaration');
+ const retained=lv(document)?.kind==='dashboard',columns:number=root.layout.columns,issues:LakeviewIssue[]=[];
+ if(columns!==6&&columns!==12)throw new UmfError('LAKEVIEW_EXPORT','Lakeview grids have 6 or 12 columns, not '+columns);
+ let baseline:ReturnType<typeof projectLakeview>|undefined;
+ if(retained){
+  const dataModules=document.modules.filter(m=>lv(m)?.kind==='data'),pageModules=document.modules.filter(m=>lv(m)?.kind==='page');
+  const ids={data:dataModules[0]?.id??'data',datasets:dataModules.flatMap(m=>m.elements.filter(e=>lv(e)?.kind==='dataset').map(e=>e.id)),pages:pageModules.map(m=>({id:m.id,items:m.elements.filter(e=>lv(e)?.kind==='layout-item').map(e=>e.id)}))};
+  baseline=projectLakeview(JSON.parse(renderTree(dashboard(document))),ids,{title:root.title});
+  if(baseline.root&&(baseline.root as any).layout.columns!==columns)issues.push({path:'/pages',code:'LAKEVIEW_SYNTH_GRID',classification:'unsupported',detail:'Grid columns changed from '+(baseline.root as any).layout.columns+' to '+columns+'; positions are exported as they are in the retained native grid',retainedInSource:true});
+ }
+  const ownerOf=(ref:{module:string;element:string})=>document.modules.find(m=>m.id===ref.module)?.elements.find(e=>e.id===ref.element);
+ const context={datasetName(ref:{module:string;element:string}){const e=ownerOf(ref),l=lv(e);if(l?.kind==='dataset')return nameOf(l.native.members.name,e!.id);return nd(e)?.kind==='dataset'?e!.id:undefined;}};
+ const record=(path:string,changes:string[])=>{if(changes.length)issues.push({path,code:'LAKEVIEW_SYNTH_PATCH',classification:'representation-change',detail:'Neutral edit applied to retained native members '+changes.join(', '),retainedInSource:true});};
+ // Elements: retained -> exact unless edited; payload-less -> synthesized.
+ const datasets:NativeJson[]=[],pages:NativeJson[]=[],names=new Set<string>();
+ for(const module of document.modules.filter(m=>lv(m)?.kind==='data'||nd(m)?.kind==='data'))for(const element of module.elements){
+  const l=lv(element),n=nd(element);
+  if(l?.kind==='dataset'){
+   let out=cloneTree(l.native),path='/datasets/'+datasets.length;
+   if(n?.kind==='dataset'){
+    const was=baseline?.elements.get(elementKey(dataModuleId(document),element.id));
+    if(was===undefined)issues.push({path,code:'LAKEVIEW_SYNTH_SKIPPED',classification:'unsupported',detail:'A neutral declaration was added to a native dataset the importer did not project; the native dataset is kept',retainedInSource:true});
+    else if(!same(was,n)){const name=nameOf((l.native as ObjectTree).members.name,element.id),a=synthesizeDataset(name,was,path),b=synthesizeDataset(name,n,path),changes:string[]=[];out=patch(out,a.native,b.native,path,changes)!;record(path,changes);issues.push(...b.issues);}
+   }
+   datasets.push(out);
+  } else if(n?.kind==='dataset'&&!l){
+   const s=synthesizeDataset(element.id,n,'/datasets/'+datasets.length);issues.push(...s.issues);datasets.push(tree(s.native));
+  }
+ }
+ for(const module of document.modules.filter(m=>lv(m)?.kind==='page'||nd(m)?.kind==='page')){
+  const l=lv(module),n=nd(module),pagePath='/pages/'+pages.length,items:NativeJson[]=[];
+  const legacy=l&&columns===12&&!Object.hasOwn(l.native.members,'layoutVersion');
+  let page:ObjectTree;
+  if(l){
+   page=cloneTree(l.native) as ObjectTree;
+   const was=baseline?.modules.get(module.id);
+   if(n?.kind==='page'&&was!==undefined&&!same(was,n)){const changes:string[]=[];patch(page,synthesizePage(was,columns),synthesizePage(n,columns),pagePath,changes);record(pagePath,changes);}
+  } else page=tree({name:module.id,...synthesizePage(n,columns)}) as ObjectTree;
+  for(const element of module.elements){
+   const el=lv(element),en=nd(element),path=pagePath+'/layout/'+items.length;
+   if(el?.kind==='layout-item'){
+    let out=cloneTree(el.native);
+    if(en){
+     const was=baseline?.elements.get(elementKey(module.id,element.id));
+     if(was===undefined)issues.push({path,code:'LAKEVIEW_SYNTH_SKIPPED',classification:'unsupported',detail:'A neutral declaration was added to a native widget the importer did not project; the native widget is kept',retainedInSource:true});
+     else if(!same(was,en)){
+      if(legacy)issues.push({path,code:'LAKEVIEW_SYNTH_GRID',classification:'unsupported',detail:'The page is a six-column legacy page in a twelve-column document; edits to its widgets are not exported and the native widget is kept',retainedInSource:true});
+      else{const name=nameOf((el.native as ObjectTree).members.widget?.kind==='object'?((el.native as ObjectTree).members.widget as ObjectTree).members.name:undefined,element.id),a=synthesizeItem(name,was,path,context),b=synthesizeItem(name,en,path,context);
+       if(a?.native===undefined||b?.native===undefined){issues.push(...(b?.issues??[]));issues.push({path,code:'LAKEVIEW_SYNTH_SKIPPED',classification:'unsupported',detail:'The edited neutral widget cannot be synthesized; the native widget is kept',retainedInSource:true});}
+       else{const changes:string[]=[];out=patch(out,a.native,b.native,path,changes)!;record(path,changes);issues.push(...b.issues);}}
+     }
+    }
+    items.push(out);
+   } else if(en&&!el&&['visual','filter','text'].includes(en.kind)){
+    if(legacy){issues.push({path,code:'LAKEVIEW_SYNTH_GRID',classification:'unsupported',detail:'New widgets are not added to a six-column legacy page in a twelve-column document',retainedInSource:true});continue;}
+    const s=synthesizeItem(element.id,en,path,context);if(!s)continue;issues.push(...s.issues);if(s.native!==undefined)items.push(tree(s.native));
+   }
+  }
+  const order=l?.order as string[]|undefined;
+  pages.push(build(page,order,items.length||order?.includes('layout')?{layout:{kind:'array',items}}:{}));
+ }
+ if(!same(root.pages,document.modules.filter(m=>nd(m)?.kind==='page').map(m=>m.id)))issues.push({path:'/pages',code:'LAKEVIEW_SYNTH_ORDER',classification:'representation-change',detail:'Pages are exported in module order, not in the order of the neutral pages list',retainedInSource:true});
+ const rootTree=retained?cloneTree(lv(document).native) as ObjectTree:{kind:'object',members:{}} as ObjectTree;
+ const theme=synthesizeTheme(root.theme),was=retained&&baseline?synthesizeTheme((baseline.root as any).theme):{};
+ if(!same(theme,was)||(!retained&&Object.keys(theme).length)){
+  const ui=rootTree.members.uiSettings?.kind==='object'?rootTree.members.uiSettings:(rootTree.members.uiSettings=tree({}) as ObjectTree);
+  const current=ui.members.theme?.kind==='object'?ui.members.theme:(ui.members.theme=tree({}));
+  const changes:string[]=[];patch(current,was,theme,'/uiSettings/theme',changes);record('/uiSettings/theme',changes);
+ }
+ const order=retained?lv(document).order as string[]:['datasets','pages','uiSettings'];
+ return {text:renderTree(build(rootTree,order,{datasets:{kind:'array',items:datasets},pages:{kind:'array',items:pages}})),issues};
+}
+const dataModuleId=(document:Document)=>document.modules.find(m=>lv(m)?.kind==='data')?.id??'data';
+// Members in `order` first (retained members unless a part replaces them), then any member only a part or a patch supplied.
+function build(native:ObjectTree,order:string[]|undefined,parts:Record<string,NativeJson>):NativeJson{
+ const keys=[...(order??Object.keys(native.members))];for(const key of [...Object.keys(native.members),...Object.keys(parts)])if(!keys.includes(key))keys.push(key);
+ return {kind:'object',members:Object.fromEntries(keys.filter(k=>Object.hasOwn(parts,k)||Object.hasOwn(native.members,k)).map(k=>[k,Object.hasOwn(parts,k)?parts[k]!:native.members[k]!]))};
 }

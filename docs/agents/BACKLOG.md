@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** —
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
@@ -41,3 +41,13 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   `dist/*` bundles which a fresh checkout does not have; and a note that installs made
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
+
+## AB-005 — Lakeview export: legacy grids, deletions and live-workspace check
+- **Type:** build · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- Follow-ups found in AB-001: (a) edits and new widgets on six-column legacy pages in a
+  twelve-column document are reported and skipped (halve x/width instead); (b) deleting a
+  neutral declaration or element does not delete its native content; (c) synthesis
+  conventions (spec versions, query field names, no associativity field) come from one
+  export and have no Databricks oracle; a human with a workspace should import a
+  synthesized file and say whether it opens.
+

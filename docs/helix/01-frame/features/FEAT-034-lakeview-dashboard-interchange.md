@@ -15,6 +15,8 @@ ddx:
       kind: informed_by
     - id: FEAT-026
       kind: informed_by
+    - id: US-094
+      kind: informed_by
 ---
 
 # FEAT-034: Lakeview dashboard interchange
@@ -63,6 +65,12 @@ hand, and the losses are recorded nowhere.
   properties cannot be dropped silently.
 - LV-05: Omit, and report, any neutral item that the dashboard profile would reject,
   rather than emitting an invalid neutral declaration.
+- LV-06: Export a `umf.dashboard` declaration to `.lvdash.json`. An element whose neutral
+  declaration equals what the importer projects from its retained payload reuses that
+  payload exactly; an edited element has only the difference between its old and new
+  synthesized form applied to the retained payload; an element without a payload is
+  synthesized. Everything the synthesis assumed or could not express is reported by
+  JSON Pointer into the exported file.
 
 ### Non-Functional Requirements
 
@@ -73,6 +81,7 @@ Databricks is unverified.
 ## User Stories
 
 - [US-093: Import a Lakeview dashboard with an explicit loss report](../user-stories/US-093-lakeview-dashboard-interchange.md).
+- [US-094: Export a neutral dashboard to Lakeview](../user-stories/US-094-neutral-to-lakeview-export.md).
 
 ## Edge Cases and Error Handling
 
@@ -91,5 +100,5 @@ every construct both declare; every unprojected construct appears in the loss re
 
 ## Out of Scope
 
-Neutral-to-Lakeview export of edited declarations, Tableau interchange, parsing SQL,
+Tableau interchange, parsing SQL,
 inferring field types without a catalog, and verifying exports against Databricks.
