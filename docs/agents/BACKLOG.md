@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** (see PR)
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
@@ -41,3 +41,12 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   `dist/*` bundles which a fresh checkout does not have; and a note that installs made
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
+
+## AB-005 — Lakeview export: detect dashboard-title edits and add a Databricks oracle check
+- **Type:** build · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- AB-001's exporter cannot detect a neutral dashboard-title edit on a retained document
+  (Lakeview files carry no title; the baseline copies the current one) and has no
+  Databricks oracle: synthesized spec versions (3 outside counter/table) and filter
+  default data types are assumptions. Decide where the title lives (e.g. a `umf.lakeview`
+  document field) and, if a workspace or published schema becomes available, validate
+  exported files against it.

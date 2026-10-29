@@ -61,6 +61,10 @@ hand, and the losses are recorded nowhere.
   `representation-change`, `unsupported` or `annotation-only`, with a JSON Pointer
   into the source. Unconsumed native content is reported generically, so new Lakeview
   properties cannot be dropped silently.
+- LV-06: Export an edited `umf.dashboard` declaration to `.lvdash.json`, reusing retained
+  native content where the neutral declaration is unchanged, writing edits into only the
+  matching native members, and synthesizing the rest with every assumption reported
+  (US-094, CONTRACT-083).
 - LV-05: Omit, and report, any neutral item that the dashboard profile would reject,
   rather than emitting an invalid neutral declaration.
 
@@ -73,6 +77,7 @@ Databricks is unverified.
 ## User Stories
 
 - [US-093: Import a Lakeview dashboard with an explicit loss report](../user-stories/US-093-lakeview-dashboard-interchange.md).
+- [US-094: Export a neutral dashboard declaration to Lakeview](../user-stories/US-094-neutral-to-lakeview-export.md).
 
 ## Edge Cases and Error Handling
 
@@ -91,5 +96,5 @@ every construct both declare; every unprojected construct appears in the loss re
 
 ## Out of Scope
 
-Neutral-to-Lakeview export of edited declarations, Tableau interchange, parsing SQL,
+Tableau interchange, parsing SQL,
 inferring field types without a catalog, and verifying exports against Databricks.

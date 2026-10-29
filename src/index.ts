@@ -26,6 +26,7 @@ export { default as jsonSchemaProtobufProjectionSchema } from '../spec/projectio
 export * from './extensions/ddd';
 export * from './extensions/dashboard';
 export * from './adapters/lakeview';
+export * from './adapters/lakeview/export';
 export * from './extensions/binding';
 export * from './projections/binding-parquet';
 export * from './projections/binding-delta';
