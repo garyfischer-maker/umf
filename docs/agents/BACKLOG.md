@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** —
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
@@ -41,3 +41,15 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   `dist/*` bundles which a fresh checkout does not have; and a note that installs made
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
+
+## AB-005 — Lakeview export: theme, page role and structural edits as member patches
+- **Type:** build · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- AB-001 reports (`LAKEVIEW_EXPORT_UNAPPLIED`) theme and page-role edits and regenerates a
+  widget for encoding, chart, dataset-reference and dataset-field edits. Patch these as
+  native members instead, so less native styling is regenerated.
+
+## AB-006 — Lakeview export: workspace oracle
+- **Type:** research · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- Synthesized widgets assume spec versions (filters/counters 2, other charts 3) and
+  filter default data types. Verify against a Databricks workspace import or published
+  schema, and record which assumptions hold. Needs human access to a workspace.

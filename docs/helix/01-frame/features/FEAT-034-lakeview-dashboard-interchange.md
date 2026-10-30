@@ -93,3 +93,8 @@ every construct both declare; every unprojected construct appears in the loss re
 
 Neutral-to-Lakeview export of edited declarations, Tableau interchange, parsing SQL,
 inferring field types without a catalog, and verifying exports against Databricks.
+
+## Neutral to Lakeview export
+
+US-094 adds export of the neutral declaration to `.lvdash.json` (CONTRACT-083, TD-093):
+retained native JSON is reused or patched, and synthesized when absent, with a report.
