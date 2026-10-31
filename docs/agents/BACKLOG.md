@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** in-review · **Depends on:** — · **PR:** —
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
@@ -41,3 +41,16 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   `dist/*` bundles which a fresh checkout does not have; and a note that installs made
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
+
+## AB-005 — Verify exported Lakeview widgets against a workspace
+- **Type:** research · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- AB-001 synthesizes widget specs (versions 2/3, `main_query`, field naming) in the shapes
+  the importer reads back; no Databricks oracle exists. Compare against openly available
+  Lakeview exports or documentation and list the spec members and versions a workspace
+  would require; propose fixes to `src/adapters/lakeview/export.ts`.
+
+## AB-006 — Export edits of filter target count and encodings
+- **Type:** build · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- AB-001 reports (`LAKEVIEW_EXPORT_EDIT`) but does not write edits to a retained visual's
+  encodings, added or removed filter targets, or dataset fields. Add write rules that
+  rewrite only the matching native query fields and encodings, with tests.

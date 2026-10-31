@@ -66,5 +66,10 @@ types; `LAKEVIEW_UNMAPPED` is left with counter `rowNumber`, `applyModeEnabled`,
   are only reported, so a projected visual can be broader than its native widget.
 - Import and inspection copy the document per payload in core validation, so a
   100-widget dashboard takes seconds; acceptable for interchange, not for editors.
-- Neutral-to-Lakeview export of an edited declaration is the next step; it must reuse
-  retained native widget JSON where the neutral item is unchanged.
+- Neutral-to-Lakeview export (`src/adapters/lakeview/export.ts`) re-projects the
+  retained native content to a baseline and compares each neutral item with it; equal
+  items reuse native JSON, edited items get targeted member rewrites, and the rest is
+  synthesized in the shapes `project.ts` reads, so the importer is the round-trip
+  oracle. Synthesized spec versions are assumed, not verified. Filter targets are
+  rewritten only when their count is unchanged; adding or removing a target, encoding
+  edits and dataset field edits are reported, not written. [NEEDS CLARIFICATION]

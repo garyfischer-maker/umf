@@ -56,6 +56,38 @@ module and pages from page modules in module order, and renders compact JSON. Th
 result equals the source after the same compact rendering; whitespace and line endings
 are not retained.
 
+## Neutral Export
+
+`exportNeutralLakeviewDashboard(document)` returns `{text, issues}`; `text` is compact
+`.lvdash.json`. The neutral declaration is authoritative for structure: datasets come
+from dataset elements of data modules in module order, pages from `umf.dashboard`
+`pages`, and layout items from page-module elements in element order. A retained native
+item that has no neutral payload (never projected) is kept; an element removed from the
+document is removed from the export.
+
+Each retained item is compared with the baseline the importer projects from the
+retained native content. Equal items reuse their native JSON exactly. For an edited
+item only these members are rewritten: dataset `displayName` and query text
+(`queryLines` or `query`); visual and filter `spec.frame.title` and `description`;
+widget `position` (legacy six-column pages divide `x` and `width` by two, and an odd
+value is reported); text-box lines; a filter target's query `datasetName` and column
+expression (same number of targets only); page `displayName` and `pageType`; theme
+members of `uiSettings.theme`. Any other changed neutral member is reported as
+`LAKEVIEW_EXPORT_EDIT` and the retained native content is unchanged.
+
+An item with no retained native JSON is synthesized in the shapes the importer reads
+back: widget and dataset names are element ids, page names are module ids, datasets
+write `queryLines` and measure `columns`, visuals write one `main_query`, filters one
+query per target, text boxes `multilineTextboxSpec`, and a twelve-column document marks
+pages `GRID_V1`. Synthesis assumptions are reported as `LAKEVIEW_EXPORT_ASSUMPTION`
+(`representation-change`): spec versions (counter and table 2, filters 2, other charts
+3), table sources written as `SELECT *`, plain text written as markdown, and the whole
+dashboard when nothing was retained. Neutral members with no native spelling (field
+types and titles, `detail` encodings, date formats, extra encodings of a singular
+channel, unknown properties) are `LAKEVIEW_EXPORT_UNEXPRESSED` (`unsupported`).
+Export issue paths are JSON Pointers into the exported file. Spec shapes are inferred
+from imported dashboards; acceptance by Databricks is unverified.
+
 ## Projection
 
 Pages map `displayName` to title and `PAGE_TYPE_GLOBAL_FILTERS` to role

@@ -64,6 +64,11 @@ hand, and the losses are recorded nowhere.
 - LV-05: Omit, and report, any neutral item that the dashboard profile would reject,
   rather than emitting an invalid neutral declaration.
 
+- LV-06: Export a `umf.dashboard` declaration to `.lvdash.json`. A native item whose
+  neutral declaration equals what the importer projects from it is reused exactly; an
+  edited item has only the native members for its changed neutral members rewritten; an
+  item with no retained native payload is synthesized and every assumption is reported.
+
 ### Non-Functional Requirements
 
 Browser-compatible TypeScript under ADR-002. No query, expression or widget spec is
@@ -73,6 +78,7 @@ Databricks is unverified.
 ## User Stories
 
 - [US-093: Import a Lakeview dashboard with an explicit loss report](../user-stories/US-093-lakeview-dashboard-interchange.md).
+- [US-094: Export a neutral dashboard to Lakeview](../user-stories/US-094-neutral-to-lakeview-export.md).
 
 ## Edge Cases and Error Handling
 
@@ -91,5 +97,6 @@ every construct both declare; every unprojected construct appears in the loss re
 
 ## Out of Scope
 
-Neutral-to-Lakeview export of edited declarations, Tableau interchange, parsing SQL,
-inferring field types without a catalog, and verifying exports against Databricks.
+Tableau interchange, parsing SQL, inferring field types without a catalog, and
+verifying exports against Databricks (including exports of edited or synthesized
+widgets, whose acceptance by a workspace is unverified).
