@@ -17,7 +17,7 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   new story criteria are SATISFIED in the ledger.
 
 ## AB-002 — Tableau workbook structure research
-- **Type:** research · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** research · **Status:** in-review · **Depends on:** — · **PR:** —
 - Document the `.twb` XML and `.twbx` package structure needed for import: datasources
   and connections, columns and calculated fields, worksheets (shelves, marks, filters),
   dashboards (zones, tiled vs floating), parameters and actions. Map each to
@@ -30,6 +30,10 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
 - **Type:** build · **Status:** open · **Depends on:** AB-002 · **PR:** —
 - Implement `umf.tableau` (exact retention) and `.twb`/`.twbx` → `umf.dashboard` with a
   loss report, following AB-002's findings and the Lakeview importer's structure.
+- AB-002 findings (`docs/agents/findings/AB-002-tableau-workbook-structure.md`) recommend
+  splitting this: first a lossless XML-tree retention layer for `umf.tableau` with an
+  XSD-valid synthetic `.twb`, then the projection. Confirm structure on one openly licensed
+  real workbook first.
 - Needs a committed test workbook. If none exists when this item starts, author a small
   synthetic `.twb` from AB-002's findings and say so in the PR.
 
