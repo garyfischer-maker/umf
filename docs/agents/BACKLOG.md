@@ -34,10 +34,16 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   synthetic `.twb` from AB-002's findings and say so in the PR.
 
 ## AB-004 — Upstream test hygiene write-up
-- **Type:** research · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** research · **Status:** in-review · **Depends on:** — · **PR:** —
 - Write draft upstream issues (for a human to file) for failures that occur on any fresh
   checkout: the Chromium 148 pin vs Playwright 1.63's Chromium 153; `/home/erik/...`
   absolute paths in key evidence; the stale tablespec loader hash; evidence that hashes
   `dist/*` bundles which a fresh checkout does not have; and a note that installs made
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
+
+## AB-005 — Verify the two unreproduced hygiene findings
+- **Type:** research · **Status:** open · **Depends on:** AB-004 · **PR:** —
+- AB-004 could not reproduce the stale `test_umf_loader.py` hash or the CRLF patch
+  problem. Find the test or install path that reports each (try a CRLF archive copy and
+  `facets-conformance`/`facets-evidence` on Chromium 153) before anything is filed.
