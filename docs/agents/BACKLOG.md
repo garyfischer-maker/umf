@@ -42,7 +42,7 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
 
-## AB-005 — Verify the two unreproduced hygiene findings
+## AB-007 — Verify the two unreproduced hygiene findings
 - **Type:** research · **Status:** open · **Depends on:** AB-004 · **PR:** —
 - AB-004 could not reproduce the stale `test_umf_loader.py` hash or the CRLF patch
   problem. Find the test or install path that reports each (try a CRLF archive copy and
