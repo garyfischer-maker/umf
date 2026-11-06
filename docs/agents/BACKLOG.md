@@ -17,7 +17,7 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   new story criteria are SATISFIED in the ledger.
 
 ## AB-002 — Tableau workbook structure research
-- **Type:** research · **Status:** in-review · **Depends on:** — · **PR:** —
+- **Type:** research · **Status:** done · **Depends on:** — · **PR:** https://github.com/garyfischer-maker/umf/pull/4
 - Document the `.twb` XML and `.twbx` package structure needed for import: datasources
   and connections, columns and calculated fields, worksheets (shelves, marks, filters),
   dashboards (zones, tiled vs floating), parameters and actions. Map each to
