@@ -38,7 +38,7 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   synthetic `.twb` from AB-002's findings and say so in the PR.
 
 ## AB-004 — Upstream test hygiene write-up
-- **Type:** research · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** research · **Status:** done · **Depends on:** — · **PR:** https://github.com/garyfischer-maker/umf/pull/5
 - Write draft upstream issues (for a human to file) for failures that occur on any fresh
   checkout: the Chromium 148 pin vs Playwright 1.63's Chromium 153; `/home/erik/...`
   absolute paths in key evidence; the stale tablespec loader hash; evidence that hashes

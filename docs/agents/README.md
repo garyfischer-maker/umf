@@ -53,7 +53,7 @@ then `export PATH="$HOME/.bun/bin:$PATH"`. Install dependencies with
 These fail on a fresh checkout and are not agent work unless an item says so:
 evidence gates that expect Chromium `148.0.7778.0` while Playwright 1.63 ships 153
 (`tests/core-ideals/*conformance*`, `*evidence*`); key evidence with absolute
-`/home/erik/...` paths; a stale `native/tablespec/sources/tests/unit/test_umf_loader.py`
-hash; tests needing `protoc` or `go` (`tests/protobuf/*`,
+`/home/erik/...` paths; evidence that hashes `dist/*` bundles a fresh clone lacks
+(`field-conformance`, `key-evidence`); tests needing `protoc` or `go` (`tests/protobuf/*`,
 `tests/projections/json-schema-protobuf.test.ts`); and long-running tests that exceed
 Bun's 5 s default on slow machines.
