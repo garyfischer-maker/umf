@@ -4,7 +4,7 @@ Statuses: `open`, `in-review` (PR open), `done` (PR merged into `agent-work`), `
 Agents take the first `open` item whose dependencies are `done`. Humans reorder freely.
 
 ## AB-001 — Neutral → Lakeview export
-- **Type:** build · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** build · **Status:** done · **Depends on:** — · **PR:** https://github.com/garyfischer-maker/umf/pull/1
 - Export a `umf.dashboard` declaration to `.lvdash.json`. Where an element still carries
   its `umf.lakeview` payload and its neutral declaration is unchanged from what
   `importLakeviewDashboard` would project, reuse the retained native JSON exactly;
@@ -17,7 +17,7 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   new story criteria are SATISFIED in the ledger.
 
 ## AB-002 — Tableau workbook structure research
-- **Type:** research · **Status:** open · **Depends on:** — · **PR:** —
+- **Type:** research · **Status:** done · **Depends on:** — · **PR:** https://github.com/garyfischer-maker/umf/pull/4
 - Document the `.twb` XML and `.twbx` package structure needed for import: datasources
   and connections, columns and calculated fields, worksheets (shelves, marks, filters),
   dashboards (zones, tiled vs floating), parameters and actions. Map each to
@@ -30,11 +30,15 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
 - **Type:** build · **Status:** open · **Depends on:** AB-002 · **PR:** —
 - Implement `umf.tableau` (exact retention) and `.twb`/`.twbx` → `umf.dashboard` with a
   loss report, following AB-002's findings and the Lakeview importer's structure.
+- AB-002 findings (`docs/agents/findings/AB-002-tableau-workbook-structure.md`) recommend
+  splitting this: first a lossless XML-tree retention layer for `umf.tableau` with an
+  XSD-valid synthetic `.twb`, then the projection. Confirm structure on one openly licensed
+  real workbook first.
 - Needs a committed test workbook. If none exists when this item starts, author a small
   synthetic `.twb` from AB-002's findings and say so in the PR.
 
 ## AB-004 — Upstream test hygiene write-up
-- **Type:** research · **Status:** in-review · **Depends on:** — · **PR:** —
+- **Type:** research · **Status:** done · **Depends on:** — · **PR:** https://github.com/garyfischer-maker/umf/pull/5
 - Write draft upstream issues (for a human to file) for failures that occur on any fresh
   checkout: the Chromium 148 pin vs Playwright 1.63's Chromium 153; `/home/erik/...`
   absolute paths in key evidence; the stale tablespec loader hash; evidence that hashes
@@ -42,8 +46,16 @@ Agents take the first `open` item whose dependencies are `done`. Humans reorder 
   from a CRLF checkout apply `patches/jsonld@9.0.0.patch` with CRLF lines. For each:
   reproduction, affected tests, root cause with file:line, and a proposed fix.
 
-## AB-007 — Verify the two unreproduced hygiene findings
-- **Type:** research · **Status:** open · **Depends on:** AB-004 · **PR:** —
-- AB-004 could not reproduce the stale `test_umf_loader.py` hash or the CRLF patch
-  problem. Find the test or install path that reports each (try a CRLF archive copy and
-  `facets-conformance`/`facets-evidence` on Chromium 153) before anything is filed.
+## AB-005 — Lakeview export: Databricks acceptance check
+- **Type:** research · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- AB-001's synthesized widget shapes (spec versions, query field names, filter default
+  data types) come from dashboards observed during import work, not a Databricks schema.
+  Find public Databricks documentation or open samples that confirm or contradict each
+  assumption listed in CONTRACT-083, and list what a human with a workspace should try
+  importing.
+
+## AB-006 — Lakeview export: carry plain column titles, types and widget query filters
+- **Type:** build · **Status:** open · **Depends on:** AB-001 · **PR:** —
+- Exports currently report neutral field titles/types and unused declared fields as
+  `LAKEVIEW_EXPORT_UNMAPPED`. Decide with a human whether `umf.lakeview` should gain a
+  place for them (for example dataset `columns` entries) before building anything.

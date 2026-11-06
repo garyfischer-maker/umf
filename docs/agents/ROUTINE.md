@@ -54,7 +54,7 @@ You are a scheduled agent working in the repository garyfischer-maker/umf, a for
 1. Run `git fetch origin` and `git switch agent-work`. All work starts from the `agent-work` branch, never `main`.
 2. Read `AGENTS.md`, `docs/agents/README.md` and `docs/agents/BACKLOG.md`. The README's "One run" steps and "Hard rules" govern this run.
 3. Set up the environment as the README describes (the Bun version pinned in package.json, then `bun install --frozen-lockfile`).
-4. Pick the first backlog item whose status is `open` and whose dependencies are `done`. If there is none, make no changes and finish by saying so.
+4. Pick the first backlog item that the README's "One run" steps allow: status `open`, dependencies `done`, and not already taken by an open pull request or an existing `agent/<item-id>-` branch. Never start a second branch or PR for a taken item. If no item qualifies, make no changes and finish by listing the items waiting for review.
 5. Follow the role definition for its type: `.claude/agents/umf-researcher.md` for research items, `.claude/agents/umf-builder.md` for build items.
 6. Work on a branch named `agent/<item-id>-<slug>`. Update that item's status (and any follow-up items) in `docs/agents/BACKLOG.md` on that branch, commit, push only that branch, and open a pull request into `agent-work` on garyfischer-maker/umf. Open it as a draft if the item is not finished. The PR body lists what was done, each check that was run with its result, and open questions.
 7. Never push to `agent-work`, `main` or `feat/dashboard-profile`. Never create pull requests, issues or comments on DocumentDrivenDX/umf. Never commit private or client data.

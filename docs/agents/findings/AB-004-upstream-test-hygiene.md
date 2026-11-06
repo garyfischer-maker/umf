@@ -55,7 +55,14 @@ external sources. Items I could not reproduce are marked.
   `JAVA_HOME` and the TableSpec source root with a clear error instead of defaulting to
   a home directory.
 
-### 3. Stale tablespec loader hash — NOT reproduced
+### 3. Stale tablespec loader hash — resolved, do not file
+
+**Review note (2026-11-06):** this was a real failure on a pre-merge checkout. On
+2026-10-21, `relationship-conformance` reported `Stale revalidated relationship source
+native/tablespec/sources/tests/unit/test_umf_loader.py` (expected `88944e41…`, actual
+`9f39055e…`) on `feat/dashboard-profile`, before upstream `main` was merged in. That
+expected hash no longer appears anywhere on `agent-work`, so the evidence refresh on
+`main` fixed it. Nothing to file. The agent's original notes follow.
 
 - **Check:** `sha256sum native/tablespec/sources/tests/unit/test_umf_loader.py` is
   `9f39055e…0fc6`. The same value is in `native/tablespec/sources.json:93` and in all
@@ -92,7 +99,14 @@ external sources. Items I could not reproduce are marked.
   `dist/*` as `unqualified: bundle not built` in both modes, and add the missing
   `dist/` paths to the recovery record only if they are truly unrecoverable.
 
-### 5. CRLF checkout and `patches/jsonld@9.0.0.patch` — NOT reproduced via git
+### 5. CRLF checkout and `patches/jsonld@9.0.0.patch` — resolved, do not file
+
+**Review note (2026-11-06):** this was a local install-order problem, not an upstream
+bug. On one Windows clone, `node_modules/jsonld` was installed on 2026-10-09, before the
+`.gitattributes` line-ending fix landed. The patch was applied from a CRLF checkout, so
+its added lines carried `\r`. Reinstalling (`rm -rf node_modules/jsonld && bun install`)
+fixed it. With the current `.gitattributes` it cannot recur through git, as the agent
+found. Nothing to file. The agent's original notes follow.
 
 - **Check:** the patch is LF in the repo (`grep -c $'\r'` → 0) and
   `git ls-files --eol` reports `attr/text=auto eol=lf`; `.gitattributes` begins with
@@ -110,11 +124,10 @@ Not applicable; this item concerns test infrastructure.
 
 ## Open questions
 
-- `[NEEDS CLARIFICATION]` Which test reports the stale `test_umf_loader.py` hash.
 - `[NEEDS CLARIFICATION]` The failing assertions of `facets-conformance` and
   `facets-evidence` on Chromium 153.
-- `[NEEDS CLARIFICATION]` Whether the CRLF patch problem was seen with the current
-  `.gitattributes`.
+- Resolved in review: the stale `test_umf_loader.py` hash (fixed on `main`) and the CRLF
+  patch install (a local, pre-fix install). Only findings 1, 2 and 4 go upstream.
 
 ## Proposed next build item
 

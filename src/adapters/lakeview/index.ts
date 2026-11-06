@@ -6,7 +6,9 @@ import {parseNativeJson,renderTree,cloneTree,type NativeJson} from '../../model/
 import {UmfError,pointer,type Document,type Json,type Diagnostic,type ExtensionPackage,type Scope} from '../../model/types';
 import {dashboardRegistry,DASHBOARD_EXTENSION} from '../../extensions/dashboard';
 import {projectLakeview,elementKey,type LakeviewIssue} from './project';
+import {exportDashboardFromNeutral,type LakeviewExport} from './export';
 export {type LakeviewIssue} from './project';
+export {type LakeviewExport,type LakeviewExportIssue} from './export';
 export const LAKEVIEW_EXTENSION='umf.lakeview';
 export const lakeviewPackage=manifest as unknown as ExtensionPackage;
 type ObjectTree=Extract<NativeJson,{kind:'object'}>;
@@ -99,3 +101,5 @@ export function getLakeviewNative(document:Document,module?:string,element?:stri
  if(element===undefined){if(lv(owner).kind!=='page')throw new UmfError('LAKEVIEW_REFERENCE','Only page modules carry native content');return renderTree(page(owner));}
  const target=lv(owner.elements.find(e=>e.id===element));if(!target)throw new UmfError('LAKEVIEW_REFERENCE','Missing Lakeview element');return renderTree(cloneTree(target.native));
 }
+/** Exports the neutral umf.dashboard declaration, reusing retained umf.lakeview JSON where the declaration is unchanged and reporting every synthesis and unreproduced member. */
+export function exportNeutralDashboard(document:Document):LakeviewExport{return exportDashboardFromNeutral(document,inspectLakeview);}
