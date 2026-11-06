@@ -7,14 +7,25 @@ agent PRs here and carries finished work to `DocumentDrivenDX/umf` separately.
 
 ## One run
 
-1. Take the first item in `BACKLOG.md` with status `open` whose dependencies are `done`.
-   If none qualifies, write a short note in the PR explaining why and stop.
-2. Branch from `agent-work` as `agent/<item-id>-<slug>`.
-3. Use the `umf-researcher` role for `research` items and `umf-builder` for `build`
+1. Find work that is already in flight, because `BACKLOG.md` on `agent-work` changes only
+   when a PR is merged:
+   - list the open pull requests into `agent-work` on `garyfischer-maker/umf`
+     (GitHub tools or the API), and
+   - list existing item branches with `git ls-remote origin 'refs/heads/agent/*'`.
+
+   An item is **taken** if any open PR's head branch, or any existing branch, starts
+   with `agent/<item-id>-`. Earlier runs may have left a branch without a PR; that
+   item is still taken, and a human decides what happens to it.
+2. Take the first item in `BACKLOG.md` with status `open` whose dependencies are `done`
+   and which is not taken. A dependency counts as `done` only when its PR is merged into
+   `agent-work`. If no item qualifies, make no branch, commit or PR. Finish by listing
+   the taken items and their PRs as waiting for review, and stop.
+3. Branch from `agent-work` as `agent/<item-id>-<slug>`.
+4. Use the `umf-researcher` role for `research` items and `umf-builder` for `build`
    items (definitions in `.claude/agents/`).
-4. In the same branch, set the item's status to `in-review`, add the PR link once it
+5. In the same branch, set the item's status to `in-review`, add the PR link once it
    exists, and append any follow-up items you discovered at the end of the backlog.
-5. Push and open a pull request **into `agent-work` on `garyfischer-maker/umf`**.
+6. Push and open a pull request **into `agent-work` on `garyfischer-maker/umf`**.
    If the item could not be finished, open it as a draft with what was learned.
 
 ## Hard rules
@@ -23,6 +34,8 @@ agent PRs here and carries finished work to `DocumentDrivenDX/umf` separately.
   own `agent/...` branch.
 - Never open PRs, issues or comments on `DocumentDrivenDX/umf`.
 - One item per run, one PR per item. Keep unrelated files untouched.
+- Never start a second branch or PR for an item that is already taken, and never vary a
+  branch name to get around that (no `-alt`, `-run4`, `-v2` suffixes).
 - Do not commit private or client data. The only real dashboard committed is
   `fixtures/lakeview/marketing-campaign.lvdash.json` (synthetic data).
 - Do not regenerate unrelated evidence fixtures (`fixtures/validation/**`, browser
