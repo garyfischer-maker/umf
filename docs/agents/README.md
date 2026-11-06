@@ -17,8 +17,9 @@ agent PRs here and carries finished work to `DocumentDrivenDX/umf` separately.
    with `agent/<item-id>-`. Earlier runs may have left a branch without a PR; that
    item is still taken, and a human decides what happens to it.
 2. Take the first item in `BACKLOG.md` with status `open` whose dependencies are `done`
-   and which is not taken. A dependency counts as `done` only when its PR is merged into
-   `agent-work`. If no item qualifies, make no branch, commit or PR. Finish by listing
+   and which is not taken. A dependency counts as `done` when its PR is merged into
+   `agent-work`, even if `BACKLOG.md` still shows `in-review`, and only then. If no item
+   qualifies, make no branch, commit or PR. Finish by listing
    the taken items and their PRs as waiting for review, and stop.
 3. Branch from `agent-work` as `agent/<item-id>-<slug>`.
 4. Use the `umf-researcher` role for `research` items and `umf-builder` for `build`
